@@ -1,0 +1,17 @@
+const mongoose = require('mongoose');
+
+const mongoURI = 'mongodb+srv://artiyadav574:nOYTWfWUVnW1lm8R@merncluster.m9ojgqm.mongodb.net/gofoodmern?retryWrites=true&w=majority';
+
+const mongoDB = async () => {
+    try {
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("Connected to MongoDB");
+    } catch (err) {
+        console.error("Error connecting to MongoDB:", err);
+    }
+};
+
+module.exports = mongoDB;
