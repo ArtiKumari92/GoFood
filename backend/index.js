@@ -19,7 +19,7 @@ app.use(express.json());
 // API routes
 app.use('/api', require('./Routes/CreateUser'));
 app.use('/api/auth', require('./Routes/GetLocation'));
-//app.use('/api/auth', require('./Routes/Auth')); // Assuming getlocation route is here
+app.use('/api', require('./Routes/DisplayData'));
 
 // Root test route
 app.get('/', (req, res) => {

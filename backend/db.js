@@ -15,20 +15,27 @@ const mongoDB = async () => {
         console.log("Connected to MongoDB");
 
         const db = mongoose.connection.db;
+        // Fetch food items
         const foodCollection = db.collection("food_items");
+        const foodData = await foodCollection.find({}).toArray();
 
-        const data = await foodCollection.find({}).toArray();
+        // Fetch food categories
+        const categoryCollection = db.collection("foodCategory");
+        const categoryData = await categoryCollection.find({}).toArray();
 
-        if (data.length === 0) {
-            console.log("No food items found in the collection.");
-        } else {
-            //console.log("Fetched food items:", data);
-            console.log("Fetched food items:");
+        if (!foodData.length || !categoryData.length) {
+            console.log("One or more collections are empty.");
         }
+
+        global.food_items = foodData;
+        global.foodCategory = categoryData;
+
+        console.log("Food items and categories loaded globally.");
 
     } catch (err) {
         console.error("Error connecting to MongoDB or fetching data:", err.message);
     }
 };
+
 
 module.exports = mongoDB;
