@@ -43,7 +43,7 @@ export default function Navbar() {
               </li>
               {localStorage.getItem("token") && (
                 <li className="nav-item">
-                  <Link className="nav-link fs-5 mx-3 active" to="/myorder">My Orders</Link>
+                  <Link className="nav-link fs-5 mx-3 active" to="/myOrder">My Orders</Link>
                 </li>
               )}
             </ul>
