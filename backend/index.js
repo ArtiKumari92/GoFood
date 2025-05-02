@@ -20,6 +20,7 @@ app.use(express.json());
 app.use('/api', require('./Routes/CreateUser'));
 app.use('/api/auth', require('./Routes/GetLocation'));
 app.use('/api', require('./Routes/DisplayData'));
+app.use('/api', require('./Routes/OrderData'));
 
 // Root test route
 app.get('/', (req, res) => {
