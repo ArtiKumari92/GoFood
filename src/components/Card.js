@@ -1,25 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatchCart, useCart } from './ContextReducer';
+import React, { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useDispatchCart, useCart } from './ContextReducer'
 
 export default function Card(props) {
   const navigate = useNavigate();
   const dispatch = useDispatchCart();
-  const data = useCart();
+  const cartData = useCart();
 
   const [qty, setQty] = useState(1);
-  const [size, setSize] = useState("");
+  const [size, setSize] = useState('');
   const priceRef = useRef();
 
-  const options = props.options || {};
+  const { options, item: foodItem, foodName, ImgSrc } = props;
   const priceOptions = Object.keys(options);
-  const foodItem = props.item;
+  const finalPrice = qty * parseInt(options[size]);
 
   useEffect(() => {
-    if (priceRef.current) {
-      setSize(priceRef.current.value);
-    }
+    setSize(priceRef.current.value);
   }, []);
+
+  const handleQtyChange = (e) => setQty(e.target.value);
+  const handleSizeChange = (e) => setSize(e.target.value);
 
   const handleClick = () => {
     if (!localStorage.getItem("token")) {
@@ -27,56 +28,71 @@ export default function Card(props) {
     }
   };
 
-  const handleQty = (e) => setQty(e.target.value);
-  const handleOptions = (e) => setSize(e.target.value);
-
-  const finalPrice = qty * parseInt(options[size] || 0);
-
   const handleAddToCart = async () => {
-    const existingItem = data.find(item => item.id === foodItem._id && item.size === size);
+    let existingItem = cartData.find(item => item.id === foodItem._id);
 
-    if (existingItem) {
-      await dispatch({ type: "UPDATE", id: foodItem._id, price: finalPrice, qty: qty });
-    } else {
-      await dispatch({
-        type: "ADD",
-        id: foodItem._id,
-        name: foodItem.name,
-        price: finalPrice,
-        qty: qty,
-        size: size,
-        img: props.ImgSrc
-      });
+    if (existingItem && Object.keys(existingItem).length !== 0) {
+      if (existingItem.size === size) {
+        await dispatch({ type: "UPDATE", id: foodItem._id, price: finalPrice, qty });
+        return;
+      } else {
+        await dispatch({
+          type: "ADD",
+          id: foodItem._id,
+          name: foodItem.name,
+          price: finalPrice,
+          qty,
+          size,
+          img: ImgSrc
+        });
+        console.log("Size different, added as new item");
+        return;
+      }
     }
+
+    await dispatch({
+      type: "ADD",
+      id: foodItem._id,
+      name: foodItem.name,
+      price: finalPrice,
+      qty,
+      size,
+      img: ImgSrc
+    });
   };
 
   return (
     <div className="card mt-3" style={{ width: "16rem", maxHeight: "360px" }}>
-      <img
-        src={props.ImgSrc}
-        className="card-img-top"
-        alt={props.foodName}
-        style={{ height: "120px", objectFit: "cover" }}
-      />
+      <img src={ImgSrc} className="card-img-top" alt="Food" style={{ height: "120px", objectFit: "fill" }} />
       <div className="card-body">
-        <h5 className="card-title">{props.foodName}</h5>
-        <div className="container w-100 p-0 d-flex align-items-center justify-content-between">
-          <select className="m-2 h-100 w-25 bg-success text-white rounded" onChange={handleQty} onClick={handleClick}>
+        <h5 className="card-title">{foodName}</h5>
+        <div className="container w-100 p-0" style={{ height: "38px" }}>
+          <select className="m-2 h-100 w-20 bg-success text-black rounded"
+            onClick={handleClick}
+            onChange={handleQtyChange}>
             {Array.from({ length: 6 }, (_, i) => (
               <option key={i + 1} value={i + 1}>{i + 1}</option>
             ))}
           </select>
 
-          <select className="m-2 h-100 w-50 bg-success text-white rounded" ref={priceRef} onChange={handleOptions} onClick={handleClick}>
-            {priceOptions.map((opt, i) => (
-              <option key={i} value={opt}>{opt}</option>
+          <select className="m-2 h-100 w-20 bg-success text-black rounded"
+            ref={priceRef}
+            onClick={handleClick}
+            onChange={handleSizeChange}>
+            {priceOptions.map(option => (
+              <option key={option} value={option}>{option}</option>
             ))}
           </select>
 
-          <div className="fs-6 fw-semibold ms-2">₹{finalPrice}/-</div>
+          <div className='d-inline ms-2 h-100 w-20 fs-5'>
+            ₹{finalPrice}/-
+          </div>
         </div>
+
         <hr />
-        <button className="btn btn-success w-100 mt-2" onClick={handleAddToCart}>Add to Cart</button>
+        <button className="btn btn-success justify-center ms-2" onClick={handleAddToCart}>
+          Add to Cart
+        </button>
       </div>
     </div>
   );
